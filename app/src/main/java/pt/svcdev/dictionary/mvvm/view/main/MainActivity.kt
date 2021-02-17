@@ -1,23 +1,34 @@
-package pt.svcdev.dictionary.mvp.view.main
+package pt.svcdev.dictionary.mvvm.view.main
 
 import android.os.Bundle
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import pt.svcdev.dictionary.App
 import pt.svcdev.dictionary.R
-import pt.svcdev.dictionary.mvp.model.data.AppState
-import pt.svcdev.dictionary.mvp.model.data.DataModel
-import pt.svcdev.dictionary.mvp.presenter.MainPresenterImpl
-import pt.svcdev.dictionary.mvp.presenter.Presenter
-import pt.svcdev.dictionary.mvp.view.base.BaseActivity
-import pt.svcdev.dictionary.mvp.view.base.View
-import pt.svcdev.dictionary.mvp.view.main.adapter.MainAdapter
+import pt.svcdev.dictionary.mvvm.interactor.MainInteractor
+import pt.svcdev.dictionary.mvvm.model.data.AppState
+import pt.svcdev.dictionary.mvvm.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.view.base.BaseActivity
+import pt.svcdev.dictionary.mvvm.view.main.adapter.MainAdapter
+import pt.svcdev.dictionary.mvvm.viewmodel.BaseViewModel
+import pt.svcdev.dictionary.mvvm.viewmodel.MainViewModel
+import pt.svcdev.dictionary.utils.isOnline
+import javax.inject.Inject
 
-class MainActivity : BaseActivity<AppState>() {
+class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
-    private var adapter: MainAdapter? = null
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    override lateinit var viewModel: BaseViewModel<AppState>
+
+    private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
             override fun onItemClick(data: DataModel) {
@@ -25,41 +36,48 @@ class MainActivity : BaseActivity<AppState>() {
             }
         }
 
-    override fun createPresenter(): Presenter<AppState, View> {
-        return MainPresenterImpl()
+    private val fabOnClickListener: View.OnClickListener = View.OnClickListener {
+        val searchDialogFragment = SearchDialogFragment.newInstance()
+        searchDialogFragment.setOnSearchClickListener(onSearchClickListener)
+        searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
     }
 
+    private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
+        object:SearchDialogFragment.OnSearchClickListener{
+            override fun onClick(searchWord: String) {
+                isNetworkAvailable = isOnline(applicationContext)
+                if (isNetworkAvailable) {
+                    viewModel.getData(searchWord, isNetworkAvailable)
+                } else {
+                    showNoInternetConnectionDialog()
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).component.inject(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        search_fab.setOnClickListener {
-            val searchDialogFragment = SearchDialogFragment.newInstance()
-            searchDialogFragment.setOnSearchClickListener(object :
-                    SearchDialogFragment.OnSearchClickListener {
-                override fun onClick(searchWord: String) {
-                    presenter.getData(searchWord, true)
-                }
-            })
-            searchDialogFragment.show(supportFragmentManager, BOTTOM_SHEET_FRAGMENT_DIALOG_TAG)
-        }
+
+        viewModel = viewModelFactory.create(MainViewModel::class.java)
+        (viewModel as MainViewModel).subscribe().observe(this@MainActivity, { renderData(it) })
+
+        search_fab.setOnClickListener(fabOnClickListener)
+        main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)
+        main_activity_recyclerview.adapter = adapter
     }
 
     override fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
+                showViewWorking()
                 val dataModel = appState.data
-                if (dataModel == null || dataModel.isEmpty()) {
+                if (dataModel.isNullOrEmpty()) {
                     showErrorScreen(getString(R.string.empty_server_response_on_success))
                 } else {
                     showViewSuccess()
-                    if (adapter == null) {
-                        main_activity_recyclerview.layoutManager =
-                            LinearLayoutManager(applicationContext)
-                        main_activity_recyclerview.adapter =
-                            MainAdapter(onListItemClickListener, dataModel)
-                    } else {
-                        adapter!!.setData(dataModel)
-                    }
+                    adapter.setData(dataModel)
                 }
             }
             is AppState.Loading -> {
@@ -74,16 +92,21 @@ class MainActivity : BaseActivity<AppState>() {
                 }
             }
             is AppState.Error -> {
+                showViewWorking()
                 showErrorScreen(appState.error.message)
             }
         }
+    }
+
+    private fun showViewWorking() {
+        loading_frame_layout.visibility = GONE
     }
 
     private fun showErrorScreen(error: String?) {
         showViewError()
         error_textview.text = error ?: getString(R.string.undefined_error)
         reload_button.setOnClickListener {
-            presenter.getData("hi", true)
+            viewModel.getData("hi", true)
         }
     }
 
@@ -94,9 +117,7 @@ class MainActivity : BaseActivity<AppState>() {
     }
 
     private fun showViewLoading() {
-        success_linear_layout.visibility = GONE
         loading_frame_layout.visibility = VISIBLE
-        error_linear_layout.visibility = GONE
     }
 
     private fun showViewError() {
