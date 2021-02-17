@@ -1,8 +1,8 @@
-package pt.svcdev.dictionary.mvp.model.repository
+package pt.svcdev.dictionary.mvvm.model.repository
 
 import io.reactivex.Observable
-import pt.svcdev.dictionary.mvp.model.data.DataModel
-import pt.svcdev.dictionary.mvp.model.datasource.DataSource
+import pt.svcdev.dictionary.mvvm.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.model.datasource.DataSource
 
 class RepositoryImpl(private val dataSource: DataSource<List<DataModel>>) :
     Repository<List<DataModel>> {

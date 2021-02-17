@@ -1,11 +1,11 @@
-package pt.svcdev.dictionary.mvp.model.datasource
+package pt.svcdev.dictionary.mvvm.model.datasource
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import io.reactivex.Observable
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import pt.svcdev.dictionary.mvp.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.model.data.DataModel
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

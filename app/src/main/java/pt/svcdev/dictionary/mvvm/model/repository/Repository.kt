@@ -1,8 +1,7 @@
-package pt.svcdev.dictionary.mvp.model.datasource
+package pt.svcdev.dictionary.mvvm.model.repository
 
 import io.reactivex.Observable
 
-interface DataSource<T> {
-
+interface Repository<T> {
     fun getData(word: String): Observable<T>
 }

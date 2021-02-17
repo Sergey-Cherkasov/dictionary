@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.model.datasource
+package pt.svcdev.dictionary.mvvm.model.datasource
 
 import okhttp3.Interceptor
 import okhttp3.Response

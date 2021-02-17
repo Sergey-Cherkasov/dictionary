@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.model.data
+package pt.svcdev.dictionary.mvvm.model.data
 
 sealed class AppState {
     data class Success(val data: List<DataModel>?) : AppState()

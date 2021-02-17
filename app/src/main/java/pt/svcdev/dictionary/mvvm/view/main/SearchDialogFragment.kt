@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.view.main
+package pt.svcdev.dictionary.mvvm.view.main
 
 import android.os.Bundle
 import android.text.Editable

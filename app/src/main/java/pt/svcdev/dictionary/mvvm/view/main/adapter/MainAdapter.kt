@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.view.main.adapter
+package pt.svcdev.dictionary.mvvm.view.main.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,10 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 import pt.svcdev.dictionary.R
-import pt.svcdev.dictionary.mvp.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.model.data.DataModel
 
-class MainAdapter(private var onListItemClickListener: OnListItemClickListener, private var data: List<DataModel>) :
+class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
+
+    private var data: List<DataModel> = listOf()
 
     fun setData(data: List<DataModel>) {
         this.data = data

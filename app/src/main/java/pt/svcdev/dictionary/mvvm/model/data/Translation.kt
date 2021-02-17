@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.model.data
+package pt.svcdev.dictionary.mvvm.model.data
 
 import com.google.gson.annotations.SerializedName
 

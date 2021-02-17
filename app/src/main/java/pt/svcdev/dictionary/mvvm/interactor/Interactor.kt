@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvp.interactor
+package pt.svcdev.dictionary.mvvm.interactor
 
 import io.reactivex.Observable
 

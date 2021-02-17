@@ -1,7 +1,7 @@
-package pt.svcdev.dictionary.mvp.model.datasource
+package pt.svcdev.dictionary.mvvm.model.datasource
 
 import io.reactivex.Observable
-import pt.svcdev.dictionary.mvp.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.model.data.DataModel
 
 class RoomDatabaseImpl : DataSource<List<DataModel>> {
 
