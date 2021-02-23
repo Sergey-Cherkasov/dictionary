@@ -5,27 +5,21 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
-import pt.svcdev.dictionary.App
+import org.koin.android.viewmodel.ext.android.viewModel
 import pt.svcdev.dictionary.R
 import pt.svcdev.dictionary.mvvm.interactor.MainInteractor
 import pt.svcdev.dictionary.mvvm.model.data.AppState
 import pt.svcdev.dictionary.mvvm.model.data.DataModel
 import pt.svcdev.dictionary.mvvm.view.base.BaseActivity
 import pt.svcdev.dictionary.mvvm.view.main.adapter.MainAdapter
-import pt.svcdev.dictionary.mvvm.viewmodel.BaseViewModel
 import pt.svcdev.dictionary.mvvm.viewmodel.MainViewModel
 import pt.svcdev.dictionary.utils.isOnline
-import javax.inject.Inject
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    override lateinit var viewModel: BaseViewModel<AppState>
+    override val viewModel: MainViewModel by viewModel()
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
 
@@ -43,7 +37,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
-        object:SearchDialogFragment.OnSearchClickListener{
+        object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
                 isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
@@ -55,13 +49,11 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as App).component.inject(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewModel = viewModelFactory.create(MainViewModel::class.java)
-        (viewModel as MainViewModel).subscribe().observe(this@MainActivity, { renderData(it) })
+        viewModel.subscribe().observe(this@MainActivity, { renderData(it) })
 
         search_fab.setOnClickListener(fabOnClickListener)
         main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)

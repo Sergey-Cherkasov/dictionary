@@ -10,9 +10,9 @@ import pt.svcdev.dictionary.mvvm.viewmodel.BaseViewModel
 import pt.svcdev.dictionary.utils.isOnline
 import pt.svcdev.dictionary.utils.ui.AlertDialogFragment
 
-abstract class BaseActivity<T : AppState, I: Interactor<T>> : AppCompatActivity() {
+abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
 
-    abstract var viewModel: BaseViewModel<T>
+    abstract val viewModel: BaseViewModel<T>
 
     protected var isNetworkAvailable: Boolean = false
 
@@ -37,7 +37,8 @@ abstract class BaseActivity<T : AppState, I: Interactor<T>> : AppCompatActivity(
     }
 
     protected fun showAlertDialog(title: String?, message: String?) {
-        AlertDialogFragment.newInstance(title, message).show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
+        AlertDialogFragment.newInstance(title, message)
+            .show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
     }
 
     private fun isDialogNull(): Boolean {
