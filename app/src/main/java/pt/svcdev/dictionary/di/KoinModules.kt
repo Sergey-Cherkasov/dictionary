@@ -1,24 +1,34 @@
-package pt.svcdev.dictionary.di.modules
+package pt.svcdev.dictionary.di
 
-import org.koin.android.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
+import androidx.room.Room
 import org.koin.dsl.module
-import pt.svcdev.dictionary.di.NAME_LOCAL
-import pt.svcdev.dictionary.di.NAME_REMOTE
 import pt.svcdev.dictionary.mvvm.interactor.MainInteractor
 import pt.svcdev.dictionary.mvvm.model.data.DataModel
 import pt.svcdev.dictionary.mvvm.model.datasource.RetrofitImpl
 import pt.svcdev.dictionary.mvvm.model.datasource.RoomDatabaseImpl
+import pt.svcdev.dictionary.mvvm.model.repository.LocalRepository
+import pt.svcdev.dictionary.mvvm.model.repository.LocalRepositoryImpl
 import pt.svcdev.dictionary.mvvm.model.repository.Repository
 import pt.svcdev.dictionary.mvvm.model.repository.RepositoryImpl
+import pt.svcdev.dictionary.mvvm.interactor.HistoryInteractor
+import pt.svcdev.dictionary.mvvm.viewmodel.HistoryViewModel
 import pt.svcdev.dictionary.mvvm.viewmodel.MainViewModel
+import pt.svcdev.dictionary.room.HistoryDatabase
 
-val app = module {
-    single<Repository<List<DataModel>>>(named(NAME_REMOTE)) { RepositoryImpl(RetrofitImpl()) }
-    single<Repository<List<DataModel>>>(named(NAME_LOCAL)) { RepositoryImpl(RoomDatabaseImpl()) }
+val application = module {
+    single { Room.databaseBuilder(get(), HistoryDatabase::class.java, "HistoryDB").build() }
+    single { get<HistoryDatabase>().historyDao() }
+
+    single<Repository<List<DataModel>>> { RepositoryImpl(RetrofitImpl()) }
+    single<LocalRepository<List<DataModel>>> { LocalRepositoryImpl(RoomDatabaseImpl(get())) }
 }
 
 val mainScreen = module {
-    factory { MainInteractor(get(named(NAME_REMOTE)), get(named(NAME_LOCAL))) }
-    viewModel { MainViewModel(get()) }
+    factory { MainViewModel(get()) }
+    factory { MainInteractor(get(), get()) }
+}
+
+val historyScreen = module {
+    factory { HistoryViewModel(get()) }
+    factory { HistoryInteractor(get(), get()) }
 }

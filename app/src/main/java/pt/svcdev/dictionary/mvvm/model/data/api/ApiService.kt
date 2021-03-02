@@ -1,4 +1,4 @@
-package pt.svcdev.dictionary.mvvm.model.datasource
+package pt.svcdev.dictionary.mvvm.model.data.api
 
 import kotlinx.coroutines.Deferred
 import pt.svcdev.dictionary.mvvm.model.data.DataModel
