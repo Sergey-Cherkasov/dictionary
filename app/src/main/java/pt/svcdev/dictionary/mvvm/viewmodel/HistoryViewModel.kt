@@ -1,15 +1,12 @@
 package pt.svcdev.dictionary.mvvm.viewmodel
 
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import pt.svcdev.dictionary.mvvm.interactor.MainInteractor
+import pt.svcdev.dictionary.mvvm.interactor.HistoryInteractor
 import pt.svcdev.dictionary.mvvm.model.data.AppState
-import pt.svcdev.dictionary.utils.parseOnlineSearchResults
+import pt.svcdev.dictionary.utils.parseLocalSearchResults
 
-class MainViewModel(private val interactor: MainInteractor) :
-    BaseViewModel<AppState>() {
+class HistoryViewModel(private val interactor: HistoryInteractor) : BaseViewModel<AppState>() {
 
     private val liveDataForViewToObserve: LiveData<AppState> = mutableLiveData
 
@@ -21,10 +18,9 @@ class MainViewModel(private val interactor: MainInteractor) :
         viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
     }
 
-    private suspend fun startInteractor(word: String, isOnline: Boolean) =
-        withContext(Dispatchers.IO) {
-            mutableLiveData.postValue(parseOnlineSearchResults(interactor.getData(word, isOnline)))
-        }
+    private suspend fun startInteractor(word: String, isOnline: Boolean) {
+        mutableLiveData.postValue(parseLocalSearchResults(interactor.getData(word, isOnline)))
+    }
 
     override fun handleError(error: Throwable) {
         mutableLiveData.postValue(AppState.Error(error))
@@ -34,4 +30,5 @@ class MainViewModel(private val interactor: MainInteractor) :
         mutableLiveData.value = AppState.Success(null)
         super.onCleared()
     }
+
 }

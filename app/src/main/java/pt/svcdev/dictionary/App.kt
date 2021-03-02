@@ -1,16 +1,19 @@
 package pt.svcdev.dictionary
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
-import pt.svcdev.dictionary.di.modules.app
-import pt.svcdev.dictionary.di.modules.mainScreen
+import pt.svcdev.dictionary.di.application
+import pt.svcdev.dictionary.di.historyScreen
+import pt.svcdev.dictionary.di.mainScreen
 
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            modules(listOf(app, mainScreen))
+            androidContext(applicationContext)
+            modules(listOf(application, mainScreen, historyScreen))
         }
     }
 

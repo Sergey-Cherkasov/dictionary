@@ -23,6 +23,7 @@ abstract class BaseViewModel<T : AppState>(
      * Метод вызывается перед уничтожением Activity
      */
     override fun onCleared() {
+        super.onCleared()
         cancelJob()
     }
 

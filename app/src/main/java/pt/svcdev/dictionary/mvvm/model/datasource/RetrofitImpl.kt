@@ -5,6 +5,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import pt.svcdev.dictionary.mvvm.model.data.DataModel
+import pt.svcdev.dictionary.mvvm.model.data.api.ApiService
+import pt.svcdev.dictionary.mvvm.model.data.api.BaseInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
