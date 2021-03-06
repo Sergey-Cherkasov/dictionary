@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="pt.svcdev.historyscreen">
+
+    <application>
+        <activity android:name="pt.svcdev.historyscreen.HistoryActivity" />
+    </application>
+</manifest>

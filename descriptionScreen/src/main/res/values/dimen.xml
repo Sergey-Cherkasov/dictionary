@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_xx_small">5dp</dimen>
+    <dimen name="margin_medium">15dp</dimen>
+
+    <dimen name="text_size_standard">17sp</dimen>
+    <dimen name="text_size_standard_header">20sp</dimen>
+
+    <dimen name="bottom_sheet_dialog_corner_radius">10dp</dimen>
+</resources>
