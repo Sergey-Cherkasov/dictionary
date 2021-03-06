@@ -1,3 +1,3 @@
-package pt.svcdev.dictionary.utils
+package pt.svcdev.utils
 
 fun String.Companion.getEmptyString(): String = ""
