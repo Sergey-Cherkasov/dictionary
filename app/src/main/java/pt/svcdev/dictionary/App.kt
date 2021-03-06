@@ -4,8 +4,8 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import pt.svcdev.dictionary.di.application
-import pt.svcdev.dictionary.di.historyScreen
-import pt.svcdev.dictionary.di.mainScreen
+import pt.svcdev.historyscreen.di.historyScreen
+import pt.svcdev.mainscreen.di.mainScreen
 
 class App : Application() {
 

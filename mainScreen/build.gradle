@@ -1,0 +1,28 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+}
+
+dependencies {
+
+    api project(Modules.core)
+    implementation project(Modules.descriptionScreen)
+    api project(Modules.historyScreen)
+
+    implementation Koin.koin
+    implementation Koin.viewmodel
+
+    implementation Kotlin.stdlib_jdk
+    implementation Kotlin.core_ktx
+    implementation Kotlin.coroutines_core
+    implementation Kotlin.coroutines_android
+
+    implementation Design.appcompat
+    implementation Design.material
+
+    testImplementation TestImpl.junit
+    androidTestImplementation TestImpl.runner
+    androidTestImplementation TestImpl.espresso
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
