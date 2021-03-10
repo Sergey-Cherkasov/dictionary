@@ -1,11 +1,27 @@
 plugins {
-    id 'com.android.library'
+    id 'com.android.dynamic-feature'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
 }
 
+android {
+    compileSdkVersion Config.sdk_version
+
+    defaultConfig {
+        minSdkVersion Config.min_sdk_version
+        targetSdkVersion Config.sdk_version
+        versionCode Config.version_code
+        versionName Config.version_name
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
 dependencies {
 
+    implementation project (Modules.app)
     implementation project(Modules.core)
 
     implementation Koin.koin

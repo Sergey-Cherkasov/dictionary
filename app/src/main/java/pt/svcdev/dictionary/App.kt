@@ -4,7 +4,6 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import pt.svcdev.dictionary.di.application
-import pt.svcdev.historyscreen.di.historyScreen
 import pt.svcdev.mainscreen.di.mainScreen
 
 class App : Application() {
@@ -13,7 +12,7 @@ class App : Application() {
         super.onCreate()
         startKoin {
             androidContext(applicationContext)
-            modules(listOf(application, mainScreen, historyScreen))
+            modules(listOf(application, mainScreen))
         }
     }
 

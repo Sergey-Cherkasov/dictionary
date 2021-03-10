@@ -35,6 +35,8 @@ android {
         targetCompatibility Config.java_version
     }
 
+    dynamicFeatures = [Modules.historyScreen]
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -44,7 +46,11 @@ dependencies {
 
     implementation project(Modules.mainScreen)
 
+    // Design
     implementation Design.material
+
+    // Google play
+    implementation GooglePlay.core
 
     //Kotlin
     implementation Kotlin.core_ktx

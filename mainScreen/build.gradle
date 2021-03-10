@@ -8,7 +8,8 @@ dependencies {
 
     api project(Modules.core)
     implementation project(Modules.descriptionScreen)
-    api project(Modules.historyScreen)
+
+    implementation GooglePlay.core
 
     implementation Koin.koin
     implementation Koin.viewmodel

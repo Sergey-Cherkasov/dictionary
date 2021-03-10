@@ -44,6 +44,9 @@ object Versions {
     // Picasso
     const val picasso = "2.5.2"
 
+    // Google play
+    const val google_play_core = "1.6.3"
+
     // Retrofit
     const val retrofit = "2.9.0"
     const val retrofit_converter_gson = "2.9.0"
@@ -87,6 +90,10 @@ object Kotlin {
 
 object Picasso {
     const val picasso = "com.squareup.picasso:picasso:${Versions.picasso}"
+}
+
+object GooglePlay {
+    const val core = "com.google.android.play:core:${Versions.google_play_core}"
 }
 
 object Retrofit {
