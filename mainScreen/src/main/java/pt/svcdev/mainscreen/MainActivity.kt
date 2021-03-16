@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -20,6 +21,7 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 import pt.svcdev.core.BaseActivity
 import pt.svcdev.descriptionscreen.DescriptionActivity
@@ -86,9 +88,9 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         if (main_activity_recyclerview.adapter != null) {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
-        val model: MainViewModel by viewModel()
+        val model: MainViewModel by currentScope.inject()
         viewModel = model
-        viewModel.subscribe().observe(this@MainActivity, { renderData(it) })
+        viewModel.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
     private fun initViews() {
