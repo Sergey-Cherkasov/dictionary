@@ -1,8 +1,10 @@
 package pt.svcdev.historyscreen
 
 import android.os.Bundle
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_history.*
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 import pt.svcdev.core.BaseActivity
 import pt.svcdev.historyscreen.di.injectDependencies
@@ -34,9 +36,9 @@ class HistoryActivity : BaseActivity<AppState, HistoryInteractor>() {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
         injectDependencies()
-        val model: HistoryViewModel by viewModel()
+        val model: HistoryViewModel by currentScope.viewModel(this)
         viewModel = model
-        viewModel.subscribe().observe(this@HistoryActivity, { renderData(it) })
+        viewModel.subscribe().observe(this@HistoryActivity, Observer<AppState> { renderData(it) })
     }
 
     private fun initViews() {

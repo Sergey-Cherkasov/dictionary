@@ -6,13 +6,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.InstallStateUpdatedListener
-import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -20,12 +20,12 @@ import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.scope.currentScope
 import pt.svcdev.core.BaseActivity
 import pt.svcdev.descriptionscreen.DescriptionActivity
 import pt.svcdev.model.AppState
 import pt.svcdev.utils.convertMeaningsToString
-import pt.svcdev.utils.isOnline
+import pt.svcdev.utils.ui.viewById
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
@@ -36,6 +36,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private lateinit var splitInstallManager: SplitInstallManager
 
     private val adapter: MainAdapter by lazy { MainAdapter(onListItemClickListener) }
+
+    private val recyclerView by viewById<RecyclerView>(R.id.main_activity_recyclerview)
 
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
@@ -60,7 +62,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
         object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
-                isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     viewModel.getData(searchWord, isNetworkAvailable)
                 } else {
@@ -70,7 +71,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -83,18 +83,18 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun initViewModel() {
-        if (main_activity_recyclerview.adapter != null) {
+        if (recyclerView.adapter != null) {
             throw IllegalStateException("The ViewModel should be initialised first")
         }
-        val model: MainViewModel by viewModel()
+        val model: MainViewModel by currentScope.inject()
         viewModel = model
-        viewModel.subscribe().observe(this@MainActivity, { renderData(it) })
+        viewModel.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
     private fun initViews() {
         search_fab.setOnClickListener(fabOnClickListener)
-        main_activity_recyclerview.layoutManager = LinearLayoutManager(applicationContext)
-        main_activity_recyclerview.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        recyclerView.adapter = adapter
     }
 
     override fun setDataToAdapter(data: List<pt.svcdev.model.DataModel>) {
@@ -126,11 +126,12 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                     popupSnackbarForCompleteUpdate()
                 }
                 if (appUpdateInfo.updateAvailability()
-                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                ) {
                     // Обновление прервано - можно возобновить установку
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,
-                        AppUpdateType.IMMEDIATE,
+                        IMMEDIATE,
                         this,
                         REQUEST_CODE
                     )
@@ -182,7 +183,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         Snackbar.make(
             findViewById(R.id.activity_main_layout),
             "An update has just been downloaded.",
-        Snackbar.LENGTH_INDEFINITE
+            Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction("RESTART") { appUpdateManager.completeUpdate() }
             show()
@@ -198,11 +199,11 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         // Проверяем наличие обновления
         appUpdateInfo.addOnSuccessListener { appUpdateIntent ->
             if (appUpdateIntent.updateAvailability() ==
-                    UpdateAvailability.UPDATE_AVAILABLE
-                    // Здесь мы делаем проверку на немедленный тип обновления
-                    // (IMMEDIATE); для гибкого нужно передавать AppUpdateType.FLEXIBLE
-                    && appUpdateIntent.isUpdateTypeAllowed(IMMEDIATE)
-                    ) {
+                UpdateAvailability.UPDATE_AVAILABLE
+                // Здесь мы делаем проверку на немедленный тип обновления
+                // (IMMEDIATE); для гибкого нужно передавать AppUpdateType.FLEXIBLE
+                && appUpdateIntent.isUpdateTypeAllowed(IMMEDIATE)
+            ) {
                 // Передаём слушатель прогресса (только для гибкого типа
                 // обновления)
                 appUpdateManager.registerListener(stateUpdatedListener)
@@ -218,8 +219,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
-    {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
@@ -230,21 +230,20 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                 // его) или не загружено (из-за проблем с соединением), показываем
                 // уведомление (также можно показать диалоговое окно с предложением
                 // попробовать обновить еще раз)
-                Toast.makeText(applicationContext,
-                    "Update flow failed! Result code: ​ $resultCode​ " , Toast.LENGTH_SHORT
+                Toast.makeText(
+                    applicationContext,
+                    "Update flow failed! Result code: ​ $resultCode​ ", Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
-    companion object {
-
-        private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
-            "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
-
-        private const val REQUEST_CODE = 101
-    }
 
 }
+
+private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
+    "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
+
+private const val REQUEST_CODE = 101
 
 private const val HISTORY_ACTIVITY_PATH = "pt.svcdev.historyscreen.HistoryActivity"
 private const val HISTORY_ACTIVITY_FEATURE_NAME = "historyScreen"
