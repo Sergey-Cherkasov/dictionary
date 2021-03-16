@@ -3,10 +3,12 @@ package pt.svcdev.mainscreen
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 import pt.svcdev.model.DataModel
 import pt.svcdev.utils.convertMeaningsToString
+import pt.svcdev.utils.ui.viewById
 
 class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
     RecyclerView.Adapter<MainAdapter.RecyclerItemViewHolder>() {
@@ -35,11 +37,16 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
 
     inner class RecyclerItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
+        private val headerText by viewById<TextView>(R.id.header_textview_recycler_item)
+        private val descriptionText by viewById<TextView>(R.id.description_textview_recycler_item)
+
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
-                itemView.header_textview_recycler_item.text = data.text
-                itemView.description_textview_recycler_item.text =
-                    convertMeaningsToString(data.meanings!!)
+                headerText.text = data.text
+//                itemView.header_textview_recycler_item.text = data.text
+                descriptionText.text = convertMeaningsToString(data.meanings!!)
+//                itemView.description_textview_recycler_item.text =
+//                    convertMeaningsToString(data.meanings!!)
 
                 itemView.setOnClickListener { openInNewWindow(data) }
             }

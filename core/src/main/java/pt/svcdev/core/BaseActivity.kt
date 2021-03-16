@@ -4,29 +4,30 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.loading_layout.*
 import pt.svcdev.core.viewmodel.BaseViewModel
 import pt.svcdev.core.viewmodel.Interactor
-import pt.svcdev.utils.isOnline
 import pt.svcdev.model.AppState
 import pt.svcdev.model.DataModel
+import pt.svcdev.utils.network.OnlineLiveData
 import pt.svcdev.utils.ui.AlertDialogFragment
 
 abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
 
     abstract val viewModel: BaseViewModel<T>
 
-    protected var isNetworkAvailable: Boolean = false
+    protected var isNetworkAvailable: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        isNetworkAvailable = isOnline(applicationContext)
+        subscribeToNetworkChange()
     }
 
     override fun onResume() {
         super.onResume()
-        isNetworkAvailable = isOnline(applicationContext)
         if (!isNetworkAvailable && isDialogNull()) {
             showNoInternetConnectionDialog()
         }
@@ -89,6 +90,22 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity
 
     private fun showViewLoading() {
         loading_frame_layout.visibility = VISIBLE
+    }
+
+    private fun subscribeToNetworkChange() {
+        OnlineLiveData(this).observe(
+            this@BaseActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    Toast.makeText(
+                        this@BaseActivity,
+                        getString(R.string.dialog_message_device_is_offline),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        )
     }
 
 }
