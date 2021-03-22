@@ -1,7 +1,9 @@
 package pt.svcdev.mainscreen
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -103,6 +105,8 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.history_menu, menu)
+        menu?.findItem(R.id.menu_network_settings)?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -110,6 +114,11 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         return when (item.itemId) {
             R.id.menu_history -> {
                 startHistoryScreen()
+                true
+            }
+            R.id.menu_network_settings -> {
+                startActivityForResult(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY),
+                    REQUEST_CODE_INTERNET_CONNECTIVITY)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -244,6 +253,7 @@ private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG =
     "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
 
 private const val REQUEST_CODE = 101
+private const val REQUEST_CODE_INTERNET_CONNECTIVITY = 42
 
 private const val HISTORY_ACTIVITY_PATH = "pt.svcdev.historyscreen.HistoryActivity"
 private const val HISTORY_ACTIVITY_FEATURE_NAME = "historyScreen"
